@@ -434,7 +434,7 @@ public class Koolitkoo {
         System.out.print("Masukkan brand skincare: ");
         String brand = scanner.nextLine();
 
-        System.out.print("Masukkan nama skincare: ");
+        System.out.print("Masukkan nama skincare:  ");
         String name = scanner.nextLine();
 
         Skincare inputProduct = null;

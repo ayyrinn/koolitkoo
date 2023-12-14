@@ -109,7 +109,7 @@ public class initestdb {
     
     public static class Moisturizer extends Skincare{
         public Moisturizer(String brand, String name){
-            super(9, "Moisturizer ", brand, name);
+            super(9, "Moisturizer", brand, name);
         }
     } 
     

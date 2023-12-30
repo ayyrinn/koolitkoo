@@ -5,6 +5,7 @@
 package koolitkoo;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
 
@@ -49,7 +50,7 @@ public class gatau {
             List<Products> selectedProducts = dayOrNight ? rutin.getMorning() : rutin.getNight();
 
             for (Products currProduct : selectedProducts) {
-                if (currProduct.getProductType().equals("Cleansing Oil")) {
+                if (currProduct.getProductType().getType().equals("Cleansing Oil")) {
                     return false;
                 }
             }
@@ -63,13 +64,13 @@ public class gatau {
         public CleansingOil() {
             super(2, "Cleansing Oil");
         }
-        
+
         public boolean checkIfCompatible(Routine rutin, boolean dayOrNight) {
 
             List<Products> selectedProducts = dayOrNight ? rutin.getMorning() : rutin.getNight();
 
             for (Products currProduct : selectedProducts) {
-                if (currProduct.getProductType().equals("Cleansing Balm")) {
+                if (currProduct.getProductType().getType().equals("Cleansing Balm")) {
                     return false;
                 }
             }
@@ -97,13 +98,13 @@ public class gatau {
         public Exfoliator() {
             super(5, "Exfoliator");
         }
-        
-            public boolean checkIfCompatible(Routine rutin, boolean dayOrNight) {
+
+        public boolean checkIfCompatible(Routine rutin, boolean dayOrNight) {
 
             List<Products> selectedProducts = dayOrNight ? rutin.getMorning() : rutin.getNight();
 
             for (Products currProduct : selectedProducts) {
-                if (currProduct.getProductType().equals("Retinol")) {
+                if (currProduct.getProductType().getType().equals("Retinol")) {
                     return false;
                 }
             }
@@ -124,13 +125,13 @@ public class gatau {
         public Retinol() {
             super(7, "Retinol");
         }
-        
+
         public boolean checkIfCompatible(Routine rutin, boolean dayOrNight) {
 
             List<Products> selectedProducts = dayOrNight ? rutin.getMorning() : rutin.getNight();
 
             for (Products currProduct : selectedProducts) {
-                if (currProduct.getProductType().equals("Exfoliator")) {
+                if (currProduct.getProductType().getType().equals("Exfoliator")) {
                     return false;
                 }
             }
@@ -144,23 +145,27 @@ public class gatau {
         public Serum() {
             super(8, "Serum");
         }
-        
+
         public boolean checkIfCompatible(Routine rutin, boolean dayOrNight) {
             int count = 0, flag = 0;
             List<Products> selectedProducts = dayOrNight ? rutin.getMorning() : rutin.getNight();
-            
+
             for (Products currProduct : selectedProducts) {
-                if (currProduct.getProductType().equals("Serum")) {
+                if (currProduct.getProductType().getType().equals("Serum")) {
                     count++;
                 }
-                if (currProduct.getProductType().equals("Retinol")) {
+                if (currProduct.getProductType().getType().equals("Retinol")) {
                     flag = 1;
                 }
             }
-            if(flag == 0){
-                if(count == 3) return false;
+            if (flag == 0) {
+                if (count == 3) {
+                    return false;
+                }
             } else {
-                if(count == 2) return false;
+                if (count == 2) {
+                    return false;
+                }
             }
             return true;
         }
@@ -266,8 +271,9 @@ public class gatau {
             //int index = findIndex(product, night);
             night.add(product);
         }
-        
+
         private void displayDetails(List<Products> products) {
+            products.sort(Comparator.comparingInt(p -> p.getProductType().getId()));
             for (Products product : products) {
                 System.out.println("  - Jenis: " + product.getProductType().getType());
                 System.out.println("    Brand: " + product.getProductBrand());
@@ -275,38 +281,20 @@ public class gatau {
             }
         }
 
-         public void display() {
+        public void display() {
             System.out.println("Rutin pada hari " + getDays() + ":");
             System.out.println("Pagi:");
             displayDetails(morning);
             System.out.println("Malam:");
             displayDetails(night);
         }
-
-//        private int findIndex(Products newProduct, List<Products> routine) {
-//            int index = 0;
-//            for (Products existingProduct : routine) {
-//                int compareResult = newProduct.get() - existingProduct.get();
-//                if (compareResult < 0) {
-//                    break;
-//                } else if (compareResult == 0) {
-//                    compareResult = newProduct.getProductBrand().compareTo(existingProduct.getProductBrand());
-//                    if (compareResult < 0 || (compareResult == 0 && newProduct.getProductName().compareTo(existingProduct.getProductName()) < 0)) {
-//                        break;
-//                    }
-//                }
-//                index++;
-//            }
-//            return index;
-//        }
     }
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
+        List<Products> productsList = new ArrayList<>();
 
         while (true) {
-            List<Products> productsList = new ArrayList<>();
-
             System.out.println("\nMenu:");
             System.out.println("1. Tambah Produk");
             System.out.println("2. Tambah Produk pada Rutin");
@@ -319,12 +307,9 @@ public class gatau {
             int choice = scanner.nextInt();
             scanner.nextLine();
 
-            Products tempProduct;
-
             switch (choice) {
                 case 1:
-                    tempProduct = addProduct();
-                    productsList.add(tempProduct);
+                    productsList.add(addProduct());
                     break;
                 case 2:
                     addRoutine(productsList);
@@ -443,6 +428,7 @@ public class gatau {
                 addProduct();
         }
         System.out.println("Skincare product berhasil ditambahkan!");
+        System.out.print("");
         return new Products(brand, name, inputProduct);
     }
 
@@ -492,37 +478,40 @@ public class gatau {
         scanner.nextLine();
 
         int[] productIds = timeOfDay.equals("pagi") ? morningIds : nightIds;
+        int[] adjustedProductIds = timeOfDay.equals("pagi") ? morningIds : nightIds;
 
-        List<Products> filteredProducts = new ArrayList<Products>();
+        List<Products> filteredProducts = new ArrayList<>();
 
         for (Products availableProduct : availableProducts) {
-            if (availableProduct.getProductType().getId() == productIds[skincareType]) {
+            if (availableProduct.getProductType().getId() == adjustedProductIds[skincareType - 1]) {
                 filteredProducts.add(availableProduct);
             }
         }
 
-        for (Products filteredProduct : filteredProducts) {
-            System.out.println(filteredProduct.productBrand);
-            System.out.println(filteredProduct.productName);
+        for (int i = 0; i < filteredProducts.size(); i++) {
+            System.out.println((i + 1) + ". Brand: " + filteredProducts.get(i).productBrand);
+            System.out.println("   Name: " + filteredProducts.get(i).productName);
         }
 
+        System.out.print("Pilih produk (1-" + filteredProducts.size() + "): ");
         int productSelected = scanner.nextInt();
         scanner.nextLine();
 
-        Products selected = filteredProducts.get(productSelected);
+        Products selected = filteredProducts.get(productSelected - 1);
 
         Routine routine = getRoutine(day);
-        
+
         boolean nightOrDay = timeOfDay.equals("pagi");
-        
-        boolean isCompatible = selected.getProductType().checkIfCompatible(routine,nightOrDay );
+
+        boolean isCompatible = selected.getProductType().checkIfCompatible(routine, nightOrDay);
 
         if (timeOfDay.equals("pagi") && isCompatible) {
             routine.addMorning(selected);
-        } else if (timeOfDay.equals("malam") && isCompatible){
+        } else if (timeOfDay.equals("malam") && isCompatible) {
             routine.addNight(selected);
         }
 
         System.out.println("Skincare berhasil ditambahkan!");
     }
+
 }

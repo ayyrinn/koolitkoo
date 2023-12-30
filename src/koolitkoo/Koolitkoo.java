@@ -17,14 +17,13 @@ import java.util.List;
 import java.util.Scanner;
 
 /**
- *
  * @author April
  */
 public class Koolitkoo {
-    
-    static final String JDBC_URL = "jdbc:mysql://localhost/koolitkoo";
+
+    static final String JDBC_URL = "jdbc:mysql://0.tcp.ap.ngrok.io:12114/koolitkoo";
     static final String DB_USER = "root";
-    static final String DB_PASSWORD = "";
+    static final String DB_PASSWORD = "KontolKuda";
 
     public static class Skincare {
 
@@ -260,11 +259,6 @@ public class Koolitkoo {
             this.night = new ArrayList<>();
         }
 
-        public String getDays() {
-            String[] days = {"Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu"};
-            return days[day - 1];
-        }
-
         public List<Products> getMorning() {
             return morning;
         }
@@ -274,41 +268,21 @@ public class Koolitkoo {
         }
 
         public void addMorning(Products product) {
-            //int index = findIndex(product, morning);
             morning.add(product);
         }
 
         public void addNight(Products product) {
-            //int index = findIndex(product, night);
             night.add(product);
-        }
-
-        private void displayDetails(List<Products> products) {
-            products.sort(Comparator.comparingInt(p -> p.getProductType().getId()));
-            for (Products product : products) {
-                System.out.println("  - Jenis: " + product.getProductType().getType());
-                System.out.println("    Brand: " + product.getProductBrand());
-                System.out.println("    Nama: " + product.getProductName());
-            }
-        }
-
-        public void display() {
-            System.out.println("Rutin pada hari " + getDays() + ":");
-            System.out.println("Pagi:");
-            System.out.println(morning.size());
-            displayDetails(morning);
-            System.out.println("Malam:");
-            displayDetails(night);
         }
     }
 
     public static void main(String[] args) {
         try (Connection connection = DriverManager.getConnection(JDBC_URL, DB_USER, DB_PASSWORD)) {
-            initializeDatabase(connection);     
+            initializeDatabase(connection);
             Scanner scanner = new Scanner(System.in);
 
             while (true) {
-                List<Products> productsList = getProductListDatabase(connection);
+                List<Products> productsList = getProductListDatabase();
                 System.out.println("\nMenu:");
                 System.out.println("1. Tambah Produk");
                 System.out.println("2. Tambah Produk pada Rutin");
@@ -323,16 +297,16 @@ public class Koolitkoo {
 
                 switch (choice) {
                     case 1:
-                        productsList.add(addProduct(connection));
+                        //productsList.add(addProduct(connection));
                         break;
                     case 2:
-                        addRoutine(connection, productsList);
+                        //addRoutine(connection, productsList);
                         break;
                     case 3:
-                        displayRoutine(connection);
+//                        displayRoutine();
                         break;
                     case 4:
-                        //editProduct();
+//                        editProduct();
                         break;
                     case 5:
                         //deleteProduct();
@@ -344,37 +318,22 @@ public class Koolitkoo {
                         System.out.println("Pilihan tidak valid.");
                 }
             }
-        }catch (SQLException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
     }
-        
+
     private static void initializeDatabase(Connection connection) throws SQLException {
         try (Statement stmt = connection.createStatement()) {
             // Create tables if not exists
-            stmt.executeUpdate("CREATE TABLE IF NOT EXISTS Skincare (" +
-                    "id INT PRIMARY KEY," +
-                    "type VARCHAR(255) NOT NULL)");
+            stmt.executeUpdate("CREATE TABLE IF NOT EXISTS skincare (" + "id INT PRIMARY KEY," + "type VARCHAR(255) NOT NULL)");
 
-            stmt.executeUpdate("CREATE TABLE IF NOT EXISTS Products (" +
-                    "id INT PRIMARY KEY AUTO_INCREMENT," +
-                    "brand VARCHAR(255) NOT NULL," +
-                    "name VARCHAR(255) NOT NULL," +
-                    "type_id INT," +  // Fix: Change "productType" to "type_id"
-                    "FOREIGN KEY (type_id) REFERENCES Skincare(id))");
+            stmt.executeUpdate("CREATE TABLE IF NOT EXISTS products (" + "id INT PRIMARY KEY AUTO_INCREMENT," + "brand VARCHAR(255) NOT NULL," + "name VARCHAR(255) NOT NULL," + "type_id INT," +  // Fix: Change "productType" to "type_id"
+                    "FOREIGN KEY (type_id) REFERENCES skincare(id))");
 
-            stmt.executeUpdate("CREATE TABLE IF NOT EXISTS Routine (" +
-                    "id INT PRIMARY KEY AUTO_INCREMENT," +
-                    "day INT NOT NULL," +
-                    "PRIMARY KEY (id)," +
-                    "UNIQUE KEY unique_day (day))");
+            stmt.executeUpdate("CREATE TABLE IF NOT EXISTS Routine (" + "id INT PRIMARY KEY AUTO_INCREMENT," + "day INT NOT NULL," + "PRIMARY KEY (id)," + "UNIQUE KEY unique_day (day))");
 
-            stmt.executeUpdate("CREATE TABLE IF NOT EXISTS RoutineDetails (" +
-                    "routine_day INT," +
-                    "time_of_day VARCHAR(255)," +
-                    "product_id INT," +
-                    "FOREIGN KEY (routine_day) REFERENCES Routine(id) ON UPDATE CASCADE ON DELETE CASCADE," +
-                    "FOREIGN KEY (product_id) REFERENCES Products(id) ON UPDATE CASCADE ON DELETE CASCADE)");
+            stmt.executeUpdate("CREATE TABLE IF NOT EXISTS routineDetails (" + "details_id INT PRIMARY KEY AUTO_INCREMENT," + "routine_day INT," + "time_of_day VARCHAR(255)," + "product_id INT," + "FOREIGN KEY (routine_day) REFERENCES routine(id) ON UPDATE CASCADE ON DELETE CASCADE," + "FOREIGN KEY (product_id) REFERENCES products(id) ON UPDATE CASCADE ON DELETE CASCADE)");
 
             try (ResultSet resultSet = stmt.executeQuery("SELECT COUNT(*) FROM Skincare")) {
                 resultSet.next();
@@ -395,7 +354,7 @@ public class Koolitkoo {
                     stmt.executeUpdate("INSERT INTO Skincare VALUES (11, 'Sunscreen')");
                 }
             }
-            try (ResultSet resultSet = stmt.executeQuery("SELECT COUNT(*) FROM Routine")) {
+            try (ResultSet resultSet = stmt.executeQuery("SELECT COUNT(*) FROM routine")) {
                 resultSet.next();
                 int routineRowCount = resultSet.getInt(1);
 
@@ -411,20 +370,20 @@ public class Koolitkoo {
 
     private static final List<Routine> routineList = new ArrayList<>();
 
-    public static void insertRoutine(Routine routine) {
-        routineList.add(routine);
-    }
+    public static List<Routine> getRoutine() throws SQLException {
+        List<Routine> routineList = new ArrayList<>();
 
-    public static void displayRoutine(Connection connection) throws SQLException {
+        Connection connection = DriverManager.getConnection(JDBC_URL, DB_USER, DB_PASSWORD);
+
         try (Statement stmt = connection.createStatement()) {
-            try (ResultSet resultSet = stmt.executeQuery("SELECT * FROM RoutineDetails")) {
+            try (ResultSet resultSet = stmt.executeQuery("SELECT * FROM routinedetails")) {
                 while (resultSet.next()) {
                     int day = resultSet.getInt("routine_day");
                     String timeOfDay = resultSet.getString("time_of_day");
                     Routine routine = getRoutineFromList(routineList, day);
 
                     int productID = resultSet.getInt("product_id");
-                    Products product = getProductFromDatabase(connection, productID);
+                    Products product = getProductFromDatabase(productID);
 
                     if (product != null) {
                         if (timeOfDay.equals("morning")) {
@@ -437,18 +396,16 @@ public class Koolitkoo {
             }
         }
 
-        // Display the routines for each day
-        for (Routine routine : routineList) {
-            routine.display();
-            System.out.println();
-        }
+        return routineList;
     }
-    
-    private static List<Products> getProductsBySkincareType(Connection connection, int skincareTypeId) throws SQLException {
+
+
+    public static List<Products> getProductsBySkincareType(int skincareTypeId) throws SQLException {
         List<Products> filteredProducts = new ArrayList<>();
 
-        try (PreparedStatement pstmt = connection.prepareStatement(
-                "SELECT * FROM Products WHERE productType = ?")) {
+        Connection connection = DriverManager.getConnection(JDBC_URL, DB_USER, DB_PASSWORD);
+
+        try (PreparedStatement pstmt = connection.prepareStatement("SELECT * FROM products WHERE productType = ?")) {
             pstmt.setInt(1, skincareTypeId);
 
             try (ResultSet resultSet = pstmt.executeQuery()) {
@@ -471,11 +428,13 @@ public class Koolitkoo {
         return filteredProducts;
     }
 
-    
-    private static Products getProductFromDatabase(Connection connection, int productID) throws SQLException {
+
+    private static Products getProductFromDatabase(int productID) throws SQLException {
+
+        Connection connection = DriverManager.getConnection(JDBC_URL, DB_USER, DB_PASSWORD);
+
         // Load product details from the Products table
-        try (PreparedStatement pstmt = connection.prepareStatement(
-                "SELECT * FROM Products WHERE id = ?")) {
+        try (PreparedStatement pstmt = connection.prepareStatement("SELECT * FROM products WHERE id = ?")) {
             pstmt.setInt(1, productID);
 
             try (ResultSet resultSet = pstmt.executeQuery()) {
@@ -492,12 +451,13 @@ public class Koolitkoo {
 
         return null;
     }
-    
-    private static List<Products> getProductListDatabase(Connection connection) throws SQLException {
+
+    public static List<Products> getProductListDatabase() throws SQLException {
+
+        Connection connection = DriverManager.getConnection(JDBC_URL, DB_USER, DB_PASSWORD);
         // Load product details from the Products table
         List<Products> productList = new ArrayList<>();
-        try (PreparedStatement pstmt = connection.prepareStatement("SELECT * FROM Products");
-             ResultSet resultSet = pstmt.executeQuery()) {
+        try (PreparedStatement pstmt = connection.prepareStatement("SELECT * FROM products"); ResultSet resultSet = pstmt.executeQuery()) {
 
             while (resultSet.next()) {
                 int typeId = resultSet.getInt("productType");
@@ -513,7 +473,6 @@ public class Koolitkoo {
     }
 
 
-    
     private static Skincare getSkincareType(int typeId) {
         // Map type ID to Skincare type
         switch (typeId) {
@@ -543,7 +502,7 @@ public class Koolitkoo {
                 return null;
         }
     }
-    
+
     private static Routine getRoutineFromList(List<Routine> routineList, int day) {
         for (Routine routine : routineList) {
             if (routine.day == day) {
@@ -556,151 +515,36 @@ public class Koolitkoo {
         return newRoutine;
     }
 
-    private static Routine getRoutine(int day) {
-        for (Routine routine : routineList) {
-            if (routine.day == day) {
-                return routine;
-            }
-        }
-        Routine newRoutine = new Routine(day);
-        routineList.add(newRoutine);
-        return newRoutine;
-    }
+    public static void addProductToDatabase(String brand, String nama, int productType) throws SQLException {
 
-    public static Products addProduct(Connection connection) throws SQLException {
-        Scanner scanner = new Scanner(System.in);
+        Connection connection = DriverManager.getConnection(JDBC_URL, DB_USER, DB_PASSWORD);
 
-        System.out.println("Jenis skincare:");
-        System.out.println("1. Cleansing Balm");
-        System.out.println("2. Cleansing Oil");
-        System.out.println("3. Micellar");
-        System.out.println("4. Cleanser");
-        System.out.println("5. Exfoliator");
-        System.out.println("6. Toner");
-        System.out.println("7. Retinol");
-        System.out.println("8. Serum");
-        System.out.println("9. Moisturizer");
-        System.out.println("10. Face Oil");
-        System.out.println("11. Sunscreen");
-        System.out.print("Pilih jenis skincare (1-11): ");
-
-        int skincareType = scanner.nextInt();
-        scanner.nextLine();
-
-        System.out.print("Masukkan brand skincare: ");
-        String brand = scanner.nextLine();
-
-        System.out.print("Masukkan nama skincare:   ");
-        String name = scanner.nextLine();
-
-        Skincare inputProduct = getSkincareType(skincareType);
-        
-        try (PreparedStatement pstmt = connection.prepareStatement(
-                "INSERT INTO Products (brand, name, productType) VALUES (?, ?, ?)")) {
+        try (PreparedStatement pstmt = connection.prepareStatement("INSERT INTO products (brand, name, productType) VALUES (?, ?, ?)")) {
             pstmt.setString(1, brand);
-            pstmt.setString(2, name);
-            pstmt.setInt(3, inputProduct.getId());
+            pstmt.setString(2, nama);
+            pstmt.setInt(3, productType);
             pstmt.executeUpdate();
         }
-        
-        System.out.println("Skincare product berhasil ditambahkan!");
-        System.out.print("");
-        return new Products(brand, name, inputProduct);
     }
 
-    public static void addRoutine(Connection connection, List<Products> availableProducts) throws SQLException {
-        Scanner scanner = new Scanner(System.in);
 
-        System.out.print("Masukkan hari (1-7): ");
-        int day = scanner.nextInt();
-        scanner.nextLine();
+    public static void addProductToRoutineInDatabase(int day, int productId, String timeOfDay) throws SQLException {
+        Connection connection = DriverManager.getConnection(JDBC_URL, DB_USER, DB_PASSWORD);
 
-        System.out.print("Pilih pagi atau malam: ");
-        String timeOfDay = scanner.nextLine().toLowerCase();
-
-        if (!timeOfDay.equals("pagi") && !timeOfDay.equals("malam")) {
-            System.out.println("Pilihan waktu tidak valid.");
-            return;
-        }
-
-        System.out.println("Jenis skincare:");
-
-        if (timeOfDay.equals("pagi")) {
-            System.out.println("1. Cleanser");
-            System.out.println("2. Toner");
-            System.out.println("3. Serum");
-            System.out.println("4. Moisturizer");
-            System.out.println("5. Face Oil");
-            System.out.println("6. Sunscreen");
-            System.out.print("Pilih jenis skincare (1-6): ");
-        } else if (timeOfDay.equals("malam")) {
-            System.out.println("1. Cleansing Balm");
-            System.out.println("2. Cleansing Oil");
-            System.out.println("3. Micellar");
-            System.out.println("4. Cleanser");
-            System.out.println("5. Exfoliator");
-            System.out.println("6. Toner");
-            System.out.println("7. Retinol");
-            System.out.println("8. Serum");
-            System.out.println("9. Moisturizer");
-            System.out.println("10. Face Oil");
-            System.out.print("Pilih jenis skincare (1-10): ");
-        }
-
-        int[] morningIds = {4, 6, 8, 9, 10, 11};
-        int[] nightIds = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-
-        int skincareType = scanner.nextInt();
-        scanner.nextLine();
-
-        int[] productIds = timeOfDay.equals("pagi") ? morningIds : nightIds;
-        int[] adjustedProductIds = timeOfDay.equals("pagi") ? morningIds : nightIds;
-        
-        List<Products> filteredProducts = getProductsBySkincareType(connection, adjustedProductIds[skincareType - 1]);
-        
-        System.out.println(skincareType);
-
-        for (int i = 0; i < filteredProducts.size(); i++) {
-            System.out.println((i + 1) + ". Brand: " + filteredProducts.get(i).productBrand);
-            System.out.println("   Name: " + filteredProducts.get(i).productName);
-        }
-
-        System.out.print("Pilih produk (1-" + filteredProducts.size() + "): ");
-        int productSelected = scanner.nextInt();
-        scanner.nextLine();
-
-        Products selected = filteredProducts.get(productSelected - 1);
-
-        Routine routine = getRoutine(day);
-
-        boolean nightOrDay = timeOfDay.equals("pagi");
-
-        boolean isCompatible = selected.getProductType().checkIfCompatible(routine, nightOrDay);
-
-        if (timeOfDay.equals("pagi") && isCompatible) {
-            addProductToRoutineInDatabase(connection, routine, selected, "morning");
-        } else if (timeOfDay.equals("malam") && isCompatible) {
-            addProductToRoutineInDatabase(connection, routine, selected, "night");
-        }
-
-        System.out.println("Skincare berhasil ditambahkan!");
-    }
-    
-    private static void addProductToRoutineInDatabase(Connection connection, Routine routine, Products product, String timeOfDay) throws SQLException {
         // Insert routine details into the RoutineDetails table
-        try (PreparedStatement pstmt = connection.prepareStatement(
-                "INSERT INTO RoutineDetails (routine_day, time_of_day, product_id) VALUES (?, ?, ?)")) {
-            pstmt.setInt(1, routine.day);
+        try (PreparedStatement pstmt = connection.prepareStatement("INSERT INTO routinedetails (routine_day, time_of_day, product_id) VALUES (?, ?, ?)")) {
+            pstmt.setInt(1, day);
             pstmt.setString(2, timeOfDay);
-            pstmt.setInt(3, getProductID(connection, product));
+            pstmt.setInt(3, productId);
             pstmt.executeUpdate();
         }
     }
-    
-    private static int getProductID(Connection connection, Products product) throws SQLException {
+
+    public static int getProductID(Products product) throws SQLException {
+        Connection connection = DriverManager.getConnection(JDBC_URL, DB_USER, DB_PASSWORD);
+
         // Retrieve the ID of the product from the Products table
-        try (PreparedStatement pstmt = connection.prepareStatement(
-                "SELECT id FROM Products WHERE brand = ? AND name = ? AND productType = ?")) {
+        try (PreparedStatement pstmt = connection.prepareStatement("SELECT id FROM products WHERE brand = ? AND name = ? AND productType = ?")) {
             pstmt.setString(1, product.getProductBrand());
             pstmt.setString(2, product.getProductName());
             pstmt.setInt(3, product.getProductType().getId());
@@ -716,4 +560,45 @@ public class Koolitkoo {
     }
 
 
+    public static void editProduct(int productId, String newBrand, String newName) throws SQLException {
+        Connection connection = DriverManager.getConnection(JDBC_URL, DB_USER, DB_PASSWORD);
+        // Check if the product with the given ID exists
+        Products selectedProduct = getProductFromDatabase(productId);
+        if (selectedProduct == null) {
+            return;
+        }
+
+
+        // Update the product in the database
+        try (PreparedStatement pstmt = connection.prepareStatement("UPDATE products SET brand = ?, name = ? WHERE id = ?")) {
+            pstmt.setString(1, newBrand.isEmpty() ? selectedProduct.getProductBrand() : newBrand);
+            pstmt.setString(2, newName.isEmpty() ? selectedProduct.getProductName() : newName);
+            pstmt.setInt(3, productId);
+            pstmt.executeUpdate();
+        }
+    }
+
+
+    public static void deleteProductFromRoutine(int day, int productId, String timeOfDay) throws SQLException {
+        Connection connection = DriverManager.getConnection(JDBC_URL, DB_USER, DB_PASSWORD);
+        try (PreparedStatement pstmt = connection.prepareStatement("DELETE FROM routinedetails WHERE routine_day = ? AND product_id = ? AND time_of_day = ?")) {
+            pstmt.setInt(1, day);
+            pstmt.setInt(2, productId);
+            pstmt.setString(3, timeOfDay);
+            pstmt.executeUpdate();
+        }
+    }
+
+
+    public static void deleteProductID(int productId) throws SQLException {
+        Connection connection = DriverManager.getConnection(JDBC_URL, DB_USER, DB_PASSWORD);
+
+        // Retrieve the ID of the product from the Products table
+        try (PreparedStatement pstmt = connection.prepareStatement("DELETE FROM products WHERE id = ?")) {
+            pstmt.setString(1, String.valueOf(productId));
+            pstmt.executeUpdate();
+
+        }
+    }
 }
+

@@ -71,9 +71,7 @@ public class TambahProdukRutinUI {
     private JComboBox skinCareTypeComboBox;
     private JComboBox productComboBox;
     private JButton tambahButton;
-    private JButton cancelButton;
     private JComboBox hariComboBox;
-
     private JPanel panel;
 
     public void UpdateProductsList() throws SQLException {
@@ -94,6 +92,35 @@ public class TambahProdukRutinUI {
             productComboBox.addItem(new ComboProduct(currProduct.getProductBrand()+" - "+currProduct.getProductName(),currProduct));
         }
 
+    }
+
+    void updateSkincareTypeBox(){
+        skinCareTypeComboBox.removeAllItems();
+        ComboItem selectedTimeOfDay = (ComboItem) timeOfDayComboBox.getSelectedItem();
+
+        if (selectedTimeOfDay.getValue().equals("morning")) {
+            skinCareTypeComboBox.addItem(new ComboItem("Cleanser", "4"));
+            skinCareTypeComboBox.addItem(new ComboItem("Toner", "7"));
+            skinCareTypeComboBox.addItem(new ComboItem("Serum", "8"));
+            skinCareTypeComboBox.addItem(new ComboItem("Moisturizer", "9"));
+            skinCareTypeComboBox.addItem(new ComboItem("Face Oil", "10"));
+            skinCareTypeComboBox.addItem(new ComboItem("Sunscreen", "11"));
+        } else {
+            skinCareTypeComboBox.addItem(new ComboItem("Cleansing Balm", "1"));
+            skinCareTypeComboBox.addItem(new ComboItem("Cleansing Oil", "2"));
+            skinCareTypeComboBox.addItem(new ComboItem("Micellar", "3"));
+            skinCareTypeComboBox.addItem(new ComboItem("Cleanser", "4"));
+            skinCareTypeComboBox.addItem(new ComboItem("Exfoliator", "5"));
+            skinCareTypeComboBox.addItem(new ComboItem("Toner", "6"));
+            skinCareTypeComboBox.addItem(new ComboItem("Retinol", "7"));
+            skinCareTypeComboBox.addItem(new ComboItem("Serum", "8"));
+            skinCareTypeComboBox.addItem(new ComboItem("Moisturizer", "9"));
+            skinCareTypeComboBox.addItem(new ComboItem("Face Oil", "10"));
+        }
+
+        // Notify ComboBoxModel about the changes
+        skinCareTypeComboBox.revalidate();
+        skinCareTypeComboBox.repaint();
     }
 
     public TambahProdukRutinUI(){
@@ -141,43 +168,13 @@ public class TambahProdukRutinUI {
                     throw new RuntimeException(ex);
                 }
             }
-        });
-        cancelButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
 
-            }
         });
 
         timeOfDayComboBox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                skinCareTypeComboBox.removeAllItems();
-                ComboItem selectedTimeOfDay = (ComboItem) timeOfDayComboBox.getSelectedItem();
-
-                if (selectedTimeOfDay.getValue().equals("morning")) {
-                    skinCareTypeComboBox.addItem(new ComboItem("Cleanser", "4"));
-                    skinCareTypeComboBox.addItem(new ComboItem("Toner", "7"));
-                    skinCareTypeComboBox.addItem(new ComboItem("Serum", "8"));
-                    skinCareTypeComboBox.addItem(new ComboItem("Moisturizer", "9"));
-                    skinCareTypeComboBox.addItem(new ComboItem("Face Oil", "10"));
-                    skinCareTypeComboBox.addItem(new ComboItem("Sunscreen", "11"));
-                } else {
-                    skinCareTypeComboBox.addItem(new ComboItem("Cleansing Balm", "1"));
-                    skinCareTypeComboBox.addItem(new ComboItem("Cleansing Oil", "2"));
-                    skinCareTypeComboBox.addItem(new ComboItem("Micellar", "3"));
-                    skinCareTypeComboBox.addItem(new ComboItem("Cleanser", "4"));
-                    skinCareTypeComboBox.addItem(new ComboItem("Exfoliator", "5"));
-                    skinCareTypeComboBox.addItem(new ComboItem("Toner", "6"));
-                    skinCareTypeComboBox.addItem(new ComboItem("Retinol", "7"));
-                    skinCareTypeComboBox.addItem(new ComboItem("Serum", "8"));
-                    skinCareTypeComboBox.addItem(new ComboItem("Moisturizer", "9"));
-                    skinCareTypeComboBox.addItem(new ComboItem("Face Oil", "10"));
-                }
-
-                // Notify ComboBoxModel about the changes
-                skinCareTypeComboBox.revalidate();
-                skinCareTypeComboBox.repaint();
+                updateSkincareTypeBox();
             }
         });
 

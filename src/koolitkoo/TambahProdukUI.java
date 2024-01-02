@@ -53,11 +53,6 @@ public class TambahProdukUI {
 
             }
         });
-        cancelButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
 
-            }
-        });
     }
 }

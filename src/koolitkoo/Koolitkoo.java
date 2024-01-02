@@ -94,12 +94,38 @@ public class Koolitkoo {
         public Micellar() {
             super(3, "Micellar Water");
         }
+        public boolean checkIfCompatible(Routine rutin, boolean dayOrNight) {
+            int count = 0, flag = 0;
+            List<Products> selectedProducts = dayOrNight ? rutin.getMorning() : rutin.getNight();
+
+            for (Products currProduct : selectedProducts) {
+                if (currProduct.getProductType().getType().equals("Micellar Water")) {
+                    count++;
+                }
+            }
+            if (count == 1) {
+                return false;
+            }
+            return true;
+        }
     }
 
     public static class Cleanser extends Skincare {
 
-        public Cleanser() {
-            super(4, "Cleanser");
+        public Cleanser() { super(4, "Cleanser"); }
+        public boolean checkIfCompatible(Routine rutin, boolean dayOrNight) {
+            int count = 0, flag = 0;
+            List<Products> selectedProducts = dayOrNight ? rutin.getMorning() : rutin.getNight();
+
+            for (Products currProduct : selectedProducts) {
+                if (currProduct.getProductType().getType().equals("Cleanser")) {
+                    count++;
+                }
+            }
+            if (count == 1) {
+                return false;
+            }
+            return true;
         }
     }
 
@@ -125,9 +151,7 @@ public class Koolitkoo {
 
     public static class Toner extends Skincare {
 
-        public Toner() {
-            super(6, "Toner");
-        }
+        public Toner() { super(6, "Toner"); }
     }
 
     public static class Retinol extends Skincare {
@@ -186,6 +210,20 @@ public class Koolitkoo {
         public Moisturizer() {
             super(9, "Moisturizer");
         }
+        public boolean checkIfCompatible(Routine rutin, boolean dayOrNight) {
+            int count = 0, flag = 0;
+            List<Products> selectedProducts = dayOrNight ? rutin.getMorning() : rutin.getNight();
+
+            for (Products currProduct : selectedProducts) {
+                if (currProduct.getProductType().getType().equals("Moisturizer")) {
+                    count++;
+                }
+            }
+            if (count == 2) {
+                    return false;
+            }
+            return true;
+        }
     }
 
     public static class FaceOil extends Skincare {
@@ -193,12 +231,38 @@ public class Koolitkoo {
         public FaceOil() {
             super(10, "Face Oil");
         }
+        public boolean checkIfCompatible(Routine rutin, boolean dayOrNight) {
+            int count = 0, flag = 0;
+            List<Products> selectedProducts = dayOrNight ? rutin.getMorning() : rutin.getNight();
+
+            for (Products currProduct : selectedProducts) {
+                if (currProduct.getProductType().getType().equals("Face Oil")) {
+                    count++;
+                }
+            }
+            if (count == 1) {
+                return false;
+            }
+            return true;
+        }
     }
 
     public static class Sunscreen extends Skincare {
 
-        public Sunscreen() {
-            super(11, "Sunscreen");
+        public Sunscreen() { super(11, "Sunscreen"); }
+        public boolean checkIfCompatible(Routine rutin, boolean dayOrNight) {
+            int count = 0, flag = 0;
+            List<Products> selectedProducts = dayOrNight ? rutin.getMorning() : rutin.getNight();
+
+            for (Products currProduct : selectedProducts) {
+                if (currProduct.getProductType().getType().equals("Sunscreen")) {
+                    count++;
+                }
+            }
+            if (count == 1) {
+                return false;
+            }
+            return true;
         }
     }
 
@@ -331,7 +395,7 @@ public class Koolitkoo {
             stmt.executeUpdate("CREATE TABLE IF NOT EXISTS products (" + "id INT PRIMARY KEY AUTO_INCREMENT," + "brand VARCHAR(255) NOT NULL," + "name VARCHAR(255) NOT NULL," + "type_id INT," +  // Fix: Change "productType" to "type_id"
                     "FOREIGN KEY (type_id) REFERENCES skincare(id))");
 
-            stmt.executeUpdate("CREATE TABLE IF NOT EXISTS Routine (" + "id INT PRIMARY KEY AUTO_INCREMENT," + "day INT NOT NULL," + "PRIMARY KEY (id)," + "UNIQUE KEY unique_day (day))");
+            stmt.executeUpdate("CREATE TABLE IF NOT EXISTS routine (" + "id INT PRIMARY KEY AUTO_INCREMENT," + "day INT NOT NULL," + "PRIMARY KEY (id)," + "UNIQUE KEY unique_day (day))");
 
             stmt.executeUpdate("CREATE TABLE IF NOT EXISTS routineDetails (" + "details_id INT PRIMARY KEY AUTO_INCREMENT," + "routine_day INT," + "time_of_day VARCHAR(255)," + "product_id INT," + "FOREIGN KEY (routine_day) REFERENCES routine(id) ON UPDATE CASCADE ON DELETE CASCADE," + "FOREIGN KEY (product_id) REFERENCES products(id) ON UPDATE CASCADE ON DELETE CASCADE)");
 
@@ -360,7 +424,7 @@ public class Koolitkoo {
 
                 if (routineRowCount == 0) {
                     for (int day = 1; day <= 7; day++) {
-                        stmt.executeUpdate("INSERT INTO Routine VALUES (NULL, " + day + ")");
+                        stmt.executeUpdate("INSERT INTO routine VALUES (NULL, " + day + ")");
                     }
                 }
             }

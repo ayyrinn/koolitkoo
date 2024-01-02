@@ -1,7 +1,4 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
+
 package koolitkoo;
 
 import java.sql.Connection;
@@ -12,7 +9,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
 
@@ -95,7 +91,7 @@ public class Koolitkoo {
             super(3, "Micellar Water");
         }
         public boolean checkIfCompatible(Routine rutin, boolean dayOrNight) {
-            int count = 0, flag = 0;
+            int count = 0;
             List<Products> selectedProducts = dayOrNight ? rutin.getMorning() : rutin.getNight();
 
             for (Products currProduct : selectedProducts) {
@@ -114,7 +110,7 @@ public class Koolitkoo {
 
         public Cleanser() { super(4, "Cleanser"); }
         public boolean checkIfCompatible(Routine rutin, boolean dayOrNight) {
-            int count = 0, flag = 0;
+            int count = 0;
             List<Products> selectedProducts = dayOrNight ? rutin.getMorning() : rutin.getNight();
 
             for (Products currProduct : selectedProducts) {
@@ -211,7 +207,7 @@ public class Koolitkoo {
             super(9, "Moisturizer");
         }
         public boolean checkIfCompatible(Routine rutin, boolean dayOrNight) {
-            int count = 0, flag = 0;
+            int count = 0;
             List<Products> selectedProducts = dayOrNight ? rutin.getMorning() : rutin.getNight();
 
             for (Products currProduct : selectedProducts) {
@@ -232,7 +228,7 @@ public class Koolitkoo {
             super(10, "Face Oil");
         }
         public boolean checkIfCompatible(Routine rutin, boolean dayOrNight) {
-            int count = 0, flag = 0;
+            int count = 0;
             List<Products> selectedProducts = dayOrNight ? rutin.getMorning() : rutin.getNight();
 
             for (Products currProduct : selectedProducts) {
@@ -251,7 +247,7 @@ public class Koolitkoo {
 
         public Sunscreen() { super(11, "Sunscreen"); }
         public boolean checkIfCompatible(Routine rutin, boolean dayOrNight) {
-            int count = 0, flag = 0;
+            int count = 0;
             List<Products> selectedProducts = dayOrNight ? rutin.getMorning() : rutin.getNight();
 
             for (Products currProduct : selectedProducts) {
@@ -288,14 +284,6 @@ public class Koolitkoo {
 
         public void setProductName(String name) {
             productName = name;
-        }
-
-        public void getProducts(List<Products> products) {
-            for (Products product : products) {
-                System.out.println("  - Jenis: " + product.getProductType());
-                System.out.println("    Brand: " + product.getProductBrand());
-                System.out.println("    Nama : " + product.getProductName());
-            }
         }
 
         public Skincare getProductType() {
@@ -399,23 +387,23 @@ public class Koolitkoo {
 
             stmt.executeUpdate("CREATE TABLE IF NOT EXISTS routineDetails (" + "details_id INT PRIMARY KEY AUTO_INCREMENT," + "routine_day INT," + "time_of_day VARCHAR(255)," + "product_id INT," + "FOREIGN KEY (routine_day) REFERENCES routine(id) ON UPDATE CASCADE ON DELETE CASCADE," + "FOREIGN KEY (product_id) REFERENCES products(id) ON UPDATE CASCADE ON DELETE CASCADE)");
 
-            try (ResultSet resultSet = stmt.executeQuery("SELECT COUNT(*) FROM Skincare")) {
+            try (ResultSet resultSet = stmt.executeQuery("SELECT COUNT(*) FROM skincare")) {
                 resultSet.next();
                 int rowCount = resultSet.getInt(1);
 
                 if (rowCount == 0) {
                     // Insert statements for each skincare type
-                    stmt.executeUpdate("INSERT INTO Skincare VALUES (1, 'Cleansing Balm')");
-                    stmt.executeUpdate("INSERT INTO Skincare VALUES (2, 'Cleansing Oil')");
-                    stmt.executeUpdate("INSERT INTO Skincare VALUES (3, 'Micellar Water')");
-                    stmt.executeUpdate("INSERT INTO Skincare VALUES (4, 'Cleanser')");
-                    stmt.executeUpdate("INSERT INTO Skincare VALUES (5, 'Exfoliator')");
-                    stmt.executeUpdate("INSERT INTO Skincare VALUES (6, 'Toner')");
-                    stmt.executeUpdate("INSERT INTO Skincare VALUES (7, 'Retinol')");
-                    stmt.executeUpdate("INSERT INTO Skincare VALUES (8, 'Serum')");
-                    stmt.executeUpdate("INSERT INTO Skincare VALUES (9, 'Moisturizer')");
-                    stmt.executeUpdate("INSERT INTO Skincare VALUES (10, 'Face Oil')");
-                    stmt.executeUpdate("INSERT INTO Skincare VALUES (11, 'Sunscreen')");
+                    stmt.executeUpdate("INSERT INTO skincare VALUES (1, 'Cleansing Balm')");
+                    stmt.executeUpdate("INSERT INTO skincare VALUES (2, 'Cleansing Oil')");
+                    stmt.executeUpdate("INSERT INTO skincare VALUES (3, 'Micellar Water')");
+                    stmt.executeUpdate("INSERT INTO skincare VALUES (4, 'Cleanser')");
+                    stmt.executeUpdate("INSERT INTO skincare VALUES (5, 'Exfoliator')");
+                    stmt.executeUpdate("INSERT INTO skincare VALUES (6, 'Toner')");
+                    stmt.executeUpdate("INSERT INTO skincare VALUES (7, 'Retinol')");
+                    stmt.executeUpdate("INSERT INTO skincare VALUES (8, 'Serum')");
+                    stmt.executeUpdate("INSERT INTO skincare VALUES (9, 'Moisturizer')");
+                    stmt.executeUpdate("INSERT INTO skincare VALUES (10, 'Face Oil')");
+                    stmt.executeUpdate("INSERT INTO skincare VALUES (11, 'Sunscreen')");
                 }
             }
             try (ResultSet resultSet = stmt.executeQuery("SELECT COUNT(*) FROM routine")) {
@@ -430,9 +418,6 @@ public class Koolitkoo {
             }
         }
     }
-
-
-    private static final List<Routine> routineList = new ArrayList<>();
 
     public static List<Routine> getRoutine() throws SQLException {
         List<Routine> routineList = new ArrayList<>();

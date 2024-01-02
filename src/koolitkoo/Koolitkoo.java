@@ -579,7 +579,7 @@ public class Koolitkoo {
         return newRoutine;
     }
 
-    public static void addProductToDatabase(String brand, String nama, int productType) throws SQLException {
+    public static void addProductToDatabase(String nama, String brand, int productType) throws SQLException {
 
         Connection connection = DriverManager.getConnection(JDBC_URL, DB_USER, DB_PASSWORD);
 

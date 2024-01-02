@@ -100,7 +100,7 @@ public class TambahProdukRutinUI {
 
         if (selectedTimeOfDay.getValue().equals("morning")) {
             skinCareTypeComboBox.addItem(new ComboItem("Cleanser", "4"));
-            skinCareTypeComboBox.addItem(new ComboItem("Toner", "7"));
+            skinCareTypeComboBox.addItem(new ComboItem("Toner", "6"));
             skinCareTypeComboBox.addItem(new ComboItem("Serum", "8"));
             skinCareTypeComboBox.addItem(new ComboItem("Moisturizer", "9"));
             skinCareTypeComboBox.addItem(new ComboItem("Face Oil", "10"));

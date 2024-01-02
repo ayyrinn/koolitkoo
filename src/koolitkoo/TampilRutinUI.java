@@ -5,8 +5,7 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import static java.lang.Integer.parseInt;
 import static koolitkoo.Koolitkoo.*;
@@ -37,6 +36,20 @@ public class TampilRutinUI {
     private JList list2;
 
     public void populateList() throws SQLException {
+        // map skincaretype
+        Map<String, Integer> skincareTypeToIndex = new HashMap<>();
+        skincareTypeToIndex.put("Cleansing Balm", 1);
+        skincareTypeToIndex.put("Cleansing Oil", 2);
+        skincareTypeToIndex.put("Micellar", 3);
+        skincareTypeToIndex.put("Cleanser", 4);
+        skincareTypeToIndex.put("Exfoliator", 5);
+        skincareTypeToIndex.put("Toner", 6);
+        skincareTypeToIndex.put("Retinol", 7);
+        skincareTypeToIndex.put("Serum", 8);
+        skincareTypeToIndex.put("Moisturizer", 9);
+        skincareTypeToIndex.put("Face Oil", 10);
+        skincareTypeToIndex.put("Sunscreen", 11);
+
         List<Koolitkoo.Routine> routineList = getRoutine();
 
         int currDay = parseInt(((ComboItem) hariComboBox.getSelectedItem()).getValue());
@@ -44,7 +57,6 @@ public class TampilRutinUI {
         DefaultListModel listModel1 = new DefaultListModel();
         DefaultListModel listModel2 = new DefaultListModel();
 
-        // Fetch the routine for the selected day only once
         List<Koolitkoo.Products> morningProducts = new ArrayList<>();
         List<Koolitkoo.Products> nightProducts = new ArrayList<>();
 
@@ -54,6 +66,10 @@ public class TampilRutinUI {
                 nightProducts.addAll(currRoutine.getNight());
             }
         }
+
+        Comparator<Products> comparator = Comparator.comparingInt(p -> skincareTypeToIndex.get(p.getProductType().getType()));
+        morningProducts.sort(comparator);
+        nightProducts.sort(comparator);
 
         // Populate listModel1 for morning routine
         for (Koolitkoo.Products morningRoutine : morningProducts) {
@@ -68,6 +84,7 @@ public class TampilRutinUI {
         list1.setModel(listModel1);
         list2.setModel(listModel2);
     }
+
 
 
 
